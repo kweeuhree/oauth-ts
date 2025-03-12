@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { LOGGED_IN_REACT_ADDRESS } from "../constants";
+import { LOGGED_IN_REACT_ADDRESS } from "../config/reactRedirectAddress";
 
 let users: string[] = [];
 

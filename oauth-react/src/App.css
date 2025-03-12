@@ -40,3 +40,18 @@
 .read-the-docs {
   color: #888;
 }
+
+.box {
+  padding: 2em;
+  border: 1px solid whitesmoke;
+  margin: 0.5em;
+}
+
+.box:hover {
+  background-color: rgba(212, 212, 212, 0.18);
+}
+
+.red-button {
+  background-color: rgba(192, 36, 36, 0.76);
+  border: 1px solid rgba(139, 36, 36, 0.93);
+}

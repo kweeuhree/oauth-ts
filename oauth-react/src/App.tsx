@@ -2,16 +2,28 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 function App() {
-  const handleLogin = () => {
+  const handleAuth0Login = () => {
     window.location.href = "http://localhost:8000/login";
+  };
+
+  const handleGoogleSignin = () => {
+    window.location.href = "http://localhost:8000/google-signin";
   };
 
   return (
     <>
-      <div>
+      <div className="box">
         <p>Log in with Auth0</p>
 
-        <button onClick={handleLogin}>Log in</button>
+        <button onClick={handleAuth0Login}>Log in</button>
+      </div>
+
+      <div className="box">
+        <p>Log in with Google OAuth</p>
+
+        <button className="red-button" onClick={handleGoogleSignin}>
+          Sign in
+        </button>
       </div>
     </>
   );
