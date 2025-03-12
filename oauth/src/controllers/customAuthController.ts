@@ -6,12 +6,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 
 import { LOGGED_IN_REACT_ADDRESS } from "../config/reactRedirectAddress";
 import {
-  GOOGLE_OAUTH_URL,
   GOOGLE_CLIENT_ID,
-  GOOGLE_OAUTH_STATE,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_ACCESS_TOKEN_URL,
-  GOOGLE_CALLBACK_URL,
   GOOGLE_OAUTH_SCOPES,
   googleAuth,
 } from "../config/googleConfig";
