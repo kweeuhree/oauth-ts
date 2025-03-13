@@ -16,8 +16,9 @@ const PORT = (portEnv && parseInt(portEnv)) || 8080;
 
 // Middlwares
 // Middleware to initialize session
+const sessionSecret = String(process.env.SESSION_SECRET);
 app.use(
-  session({ secret: "your-secret-key", resave: false, saveUninitialized: true })
+  session({ secret: sessionSecret, resave: false, saveUninitialized: true })
 );
 app.use(loggerMiddleware);
 app.use(express.json());
