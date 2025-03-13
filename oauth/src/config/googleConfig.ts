@@ -1,8 +1,5 @@
-import { google } from "googleapis";
-
 export const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-export const GOOGLE_OAUTH_STATE = process.env.GOOGLE_OAUTH_STATE;
 
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 export const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
@@ -12,21 +9,3 @@ export const GOOGLE_OAUTH_SCOPES = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/userinfo.profile",
 ];
-
-// An error response:
-// https://oauth2.example.com/auth?error=access_denied
-
-const initializeGoogleAuth = () => {
-  return new google.auth.OAuth2(
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_CALLBACK_URL
-  );
-};
-
-// Handles authentication (sign-in, token exchange, and refreshing tokens)
-export const googleAuthClient = initializeGoogleAuth();
-
-// Provides access to the Google OAuth2 API, which allows
-// to retrieve the user's profile data (name, email)
-export const oauth2 = google.oauth2({ version: "v2", auth: googleAuthClient });
