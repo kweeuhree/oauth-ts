@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { google } from "googleapis";
 
 import { randomBytes } from "node:crypto";
 import { URL } from "node:url";
@@ -8,7 +9,8 @@ import { LOGGED_IN_REACT_ADDRESS } from "../config/reactRedirectAddress";
 import {
   GOOGLE_CLIENT_ID,
   GOOGLE_OAUTH_SCOPES,
-  googleAuth,
+  googleAuthClient,
+  oauth2,
 } from "../config/googleConfig";
 
 let users: string[] = [];
@@ -49,9 +51,9 @@ export const googleSignIn = async (req: Request, res: Response) => {
   const scopes = GOOGLE_OAUTH_SCOPES.join(" ");
   // const scopes = "openid%20email&20profile";
   // Generate a url that asks permissions for the Drive activity and Google Calendar scope
-  const authorizationUrl = googleAuth.generateAuthUrl({
+  const authorizationUrl = googleAuthClient.generateAuthUrl({
     // 'online' (default) or 'offline' (gets refresh_token)
-    access_type: "online",
+    access_type: "offline",
     /** Pass in the scopes array defined above.
      * Alternatively, if only one scope is needed, you can pass a scope URL as a string */
     scope: scopes,
@@ -84,43 +86,33 @@ export const googleCallback = async (req: Request, res: Response) => {
     res.end("State mismatch. Possible CSRF attack");
   } else {
     // Get access and refresh tokens (if access_type is offline)
+    let { tokens } = await googleAuthClient.getToken(q.code);
 
-    let { tokens } = await googleAuth.getToken(q.code);
-    googleAuth.setCredentials(tokens);
+    // setCredentials(tokens) only stores the tokens in memory.
+    // If your server restarts, they will be lost unless you persisted
+    googleAuthClient.setCredentials(tokens);
+
     console.log("token info", tokens);
     if (
       tokens.scope &&
       tokens.scope.includes(GOOGLE_OAUTH_SCOPES[0]) &&
       tokens.scope.includes(GOOGLE_OAUTH_SCOPES[1])
     ) {
-      // User authorized read-only Drive activity permission.
-      // Calling the APIs, etc.
-      const { id_token } = tokens;
-
-      const tokenInfoResponse = await fetch(
-        `${process.env.GOOGLE_TOKEN_INFO_URL}?id_token=${id_token}`
-      );
-      if (!tokenInfoResponse.ok) {
-        console.log("tokenInfoResponse.status", tokenInfoResponse.status);
-        res
-          .status(tokenInfoResponse.status)
-          .json({ message: "Failed to verify token" });
-        return;
-      }
-      const tokenInfo = await tokenInfoResponse.json();
-
+      // Because we are communicating directly with a Google server,
+      // We can be confident that the token is valid
+      const { data } = await oauth2.userinfo.get();
+      const { email, name } = data;
+      console.log("token info", data);
       // get user or create user
-      const { email, name } = tokenInfo;
-      console.log("token info", tokenInfo);
-      let user = users.includes(email);
-      if (!user) {
+      let user = email && users.includes(email);
+      if (email && !user) {
         users.push(email);
         console.log("users email array: ", users);
       }
       try {
-        const token = generateToken({ email, name });
+        const token = email && name && generateToken({ email, name });
         console.log("token: ", token);
-        console.log("tokenInfoResponse.status", tokenInfoResponse.status);
+        // console.log("tokenInfoResponse.status", tokenInfoResponse.status);
         res.cookie("token", token, {
           httpOnly: true,
           secure: true,

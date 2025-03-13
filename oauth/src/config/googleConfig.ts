@@ -31,4 +31,9 @@ const initializeGoogleAuth = () => {
   );
 };
 
-export const googleAuth = initializeGoogleAuth();
+// Handles authentication (sign-in, token exchange, and refreshing tokens)
+export const googleAuthClient = initializeGoogleAuth();
+
+// Provides access to the Google OAuth2 API, which allows
+// to retrieve the user's profile data (name, email)
+export const oauth2 = google.oauth2({ version: "v2", auth: googleAuthClient });
