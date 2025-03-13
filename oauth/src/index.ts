@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
 import { auth } from "express-openid-connect";
 require("dotenv").config();
@@ -14,6 +15,10 @@ const portEnv = process.env.PORT;
 const PORT = (portEnv && parseInt(portEnv)) || 8080;
 
 // Middlwares
+// Middleware to initialize session
+app.use(
+  session({ secret: "your-secret-key", resave: false, saveUninitialized: true })
+);
 app.use(loggerMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
