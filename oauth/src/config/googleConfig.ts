@@ -13,13 +13,6 @@ export const GOOGLE_OAUTH_SCOPES = [
   "https://www.googleapis.com/auth/userinfo.profile",
 ];
 
-// You must include the Google Platform Library on your web pages that integrate Google Sign-In.
-// <script src="https://apis.google.com/js/platform.js" async defer></script>
-
-// Add a Google Sign-In button
-// <div class="g-signin2" data-onsuccess="onSignIn"></div>
-
-//
 // An error response:
 // https://oauth2.example.com/auth?error=access_denied
 
