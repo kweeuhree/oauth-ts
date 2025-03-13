@@ -1,20 +1,16 @@
 import { Request, Response } from "express";
 
-import { randomBytes } from "node:crypto";
-import { LOGGED_IN_REACT_ADDRESS } from "../config";
 import { googleAuth } from "../services/GoogleAuth";
-import { generateToken } from "../utils/generateToken";
+
+import { LOGGED_IN_REACT_ADDRESS } from "../config";
+import { generateToken, generateRandomHexString } from "../utils";
 import { GSession } from "../types";
 
 let users: string[] = [];
 
-const newState = (): string => {
-  return randomBytes(32).toString("hex");
-};
-
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    const state = newState();
+    const state = generateRandomHexString();
     (req.session as GSession).googleAuthState = state;
     // Generate a url that asks permissions for the Drive activity and Google Calendar scope
     const authorizationUrl = googleAuth.generateAuthUrl(state);
@@ -29,12 +25,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
 export const googleCallback = async (req: Request, res: Response) => {
   console.info("googleCallback");
   try {
-    const authenticated = await googleAuth.authenticate(
-      req.url,
-      req.headers,
-      (req.session as GSession).googleAuthState
-    );
-    console.log(authenticated);
+    const authenticated = await googleAuth.authenticate(req);
+
     if (authenticated) {
       const { email, name } = authenticated;
       // =======================================
