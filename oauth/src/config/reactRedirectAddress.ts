@@ -1,1 +1,2 @@
-export const LOGGED_IN_REACT_ADDRESS = "http://localhost:5173/logged";
+export const HOME_REACT_ADDRESS = process.env.HOME_REACT_ADDRESS;
+export const LOGGED_IN_REACT_ADDRESS = `${HOME_REACT_ADDRESS}/logged`;
