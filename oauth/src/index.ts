@@ -13,8 +13,7 @@ import { log } from "./appLogger.js";
 
 const app = express();
 
-const portEnv = process.env.PORT;
-const PORT = (portEnv && parseInt(portEnv)) || 8080;
+const PORT = process.env.PORT;
 
 // Middlwares
 // Middleware to initialize session
@@ -40,7 +39,7 @@ app.use(errorHandlerMiddleware);
 // Routes
 app.use("/", router);
 
-const server = app.listen(PORT, "0.0.0.0", (error: any) => {
+const server = app.listen(Number(PORT), "0.0.0.0", (error: any) => {
   if (error) {
     throw error;
   }
