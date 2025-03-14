@@ -1,3 +1,2 @@
-export * as authController from "./authController";
-export * as customAuthController from "./customAuthController";
-export * as userController from "./userController";
+export * as customAuthController from "./customAuthController.js";
+// export * as userController from "./userController.js";
