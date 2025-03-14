@@ -15,7 +15,6 @@ export const generateToken = ({
     issuer: "AIHelper",
     audience: GOOGLE_CLIENT_ID,
   };
-  console.log(options);
   const token = jwt.sign(
     { id: email, username: name },
     String(process.env.JWT_SECRET),
