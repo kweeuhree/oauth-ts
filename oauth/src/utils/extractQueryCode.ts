@@ -4,9 +4,6 @@ export const extractCode = (req: any, state: string) => {
   // Parse the URL to extract necessary parameters
   const url = new URL(req.url, `http://${req.headers.host}`);
   let q = Object.fromEntries(url.searchParams.entries());
-  console.log("inside extract code");
-  console.log(q.state);
-  console.log(state);
   try {
     if (q.error) {
       // An error response e.g. error=access_denied
