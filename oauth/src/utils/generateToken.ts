@@ -1,6 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 
-import { GOOGLE_CLIENT_ID } from "../config";
+import { GOOGLE_CLIENT_ID } from "../config/index.js";
 
 export const generateToken = ({
   email,
