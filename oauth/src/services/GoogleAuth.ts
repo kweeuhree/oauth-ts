@@ -64,8 +64,8 @@ class GoogleAuth {
         tokens.scope.includes(GOOGLE_OAUTH_SCOPES[1])
       ) {
         // Get user email and name
-        const { email, name } = await this.getUserInfo();
-        return { email, name };
+        const user = await this.getUserInfo();
+        return user;
       }
     } catch (error) {
       console.error(error);
@@ -81,7 +81,10 @@ class GoogleAuth {
     try {
       const { data } = await this.oauth2.userinfo.get();
       const { email, name } = data;
-      return { email, name };
+      if (name && email) {
+        return { email, name };
+      }
+      return;
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : String(error));
     }
