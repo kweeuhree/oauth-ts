@@ -8,12 +8,6 @@ const handleRedirect = (url: string) => {
 function App() {
   return (
     <>
-      {/* <div className="box">
-        <p>Log in with Auth0</p>
-
-        <button onClick={handleAuth0Login}>Log in</button>
-      </div> */}
-
       <div className="box">
         <p>Sign in with Google OAuth</p>
         <button className="red-button" onClick={() => handleRedirect("google")}>
