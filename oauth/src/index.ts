@@ -26,7 +26,7 @@ app.use(loggerMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = [HOME_REACT_ADDRESS];
+const allowedOrigins = [String(HOME_REACT_ADDRESS)];
 app.use(
   cors({
     credentials: true,
