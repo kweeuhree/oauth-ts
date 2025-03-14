@@ -1,29 +1,29 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
+const handleRedirect = (url: string) => {
+  window.location.href = `http://localhost:8000/auth/${url}`;
+};
+
 function App() {
-  const handleAuth0Login = () => {
-    window.location.href = "http://localhost:8000/login";
-  };
-
-  const handleGoogleSignin = () => {
-    window.location.href = "http://localhost:8000/google-signin";
-  };
-
   return (
     <>
-      <div className="box">
+      {/* <div className="box">
         <p>Log in with Auth0</p>
 
         <button onClick={handleAuth0Login}>Log in</button>
+      </div> */}
+
+      <div className="box">
+        <p>Sign in with Google OAuth</p>
+        <button className="red-button" onClick={() => handleRedirect("google")}>
+          Sign in
+        </button>
       </div>
 
       <div className="box">
-        <p>Log in with Google OAuth</p>
-
-        <button className="red-button" onClick={handleGoogleSignin}>
-          Sign in
-        </button>
+        <p>Sign in with GitHub OAuth</p>
+        <button onClick={() => handleRedirect("github")}>Sign in</button>
       </div>
     </>
   );
