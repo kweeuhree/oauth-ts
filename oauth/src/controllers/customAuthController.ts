@@ -11,6 +11,11 @@ import { GSession } from "../types.js";
 
 let users: string[] = [];
 
+interface UserPayload {
+  email: string;
+  name: string;
+}
+
 // =======================================
 // GitHub
 // =======================================
@@ -26,11 +31,9 @@ export const githubSignIn = async (req: Request, res: Response) => {
 
 export const githubCallback = async (req: Request, res: Response) => {
   try {
-    const authenticated = await githubAuth.authenticate(req);
-    if (authenticated) {
-      console.log("authenticated", authenticated);
-      res.redirect(LOGGED_IN_REACT_ADDRESS);
-    }
+    const user = await githubAuth.authenticate(req);
+    if (!user) return;
+    processUserAndSendResponse(res, user);
   } catch (error) {
     res.redirect(String(HOME_REACT_ADDRESS));
   } finally {
@@ -57,27 +60,10 @@ export const googleSignIn = async (req: Request, res: Response) => {
 };
 
 export const googleCallback = async (req: Request, res: Response) => {
-  console.info("googleCallback");
   try {
-    const authenticated = await googleAuth.authenticate(req);
-
-    if (authenticated) {
-      const { email, name } = authenticated;
-      // =======================================
-      // Database interaction
-      // =======================================
-      email && interactWithDatabase(email);
-      // =======================================
-
-      const token = email && name && generateToken({ email, name });
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-      });
-      res.redirect(LOGGED_IN_REACT_ADDRESS);
-      return;
-    }
+    const user = await googleAuth.authenticate(req);
+    if (!user) return;
+    processUserAndSendResponse(res, user);
   } catch (error) {
     res.redirect(String(HOME_REACT_ADDRESS));
   } finally {
@@ -85,9 +71,30 @@ export const googleCallback = async (req: Request, res: Response) => {
   }
 };
 
-const interactWithDatabase = (email: string) => {
-  let user = email && users.includes(email);
-  if (email && !user) {
-    users.push(email);
+const processUserAndSendResponse = (res: Response, user: UserPayload) => {
+  try {
+    // =======================================
+    // Database interaction
+    // =======================================
+    interactWithDatabase(user);
+    // =======================================
+
+    const token = generateToken(user);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+    });
+    res.redirect(LOGGED_IN_REACT_ADDRESS);
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
+};
+
+const interactWithDatabase = (user: UserPayload) => {
+  if (!user.email) return;
+  let exists = users.includes(user.email);
+  if (!exists) {
+    users.push(user.email);
   }
 };
