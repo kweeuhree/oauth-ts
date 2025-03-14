@@ -8,6 +8,23 @@ import {
   GOOGLE_OAUTH_SCOPES,
 } from "../config/index.js";
 
+class GoogleAPIError extends Error {
+  constructor(message: string) {
+    // Call the constructor of the base class `Error`
+    // And set the error name to the custom error class name
+    super(message);
+    this.name = "GoogleAPIError";
+    // Set the prototype explicitly to maintain the correct prototype chain
+    Object.setPrototypeOf(this, GoogleAPIError.prototype);
+  }
+}
+
+const throwGoogleError = (error: any) => {
+  throw new GoogleAPIError(
+    error instanceof Error ? error.message : String(error)
+  );
+};
+
 class GoogleAuth {
   private authClient: Auth.OAuth2Client;
   private oauth2;
@@ -69,12 +86,14 @@ class GoogleAuth {
       }
     } catch (error) {
       console.error(error);
-      throw new Error(error instanceof Error ? error.message : String(error));
+      throwGoogleError(error);
     }
   };
 
   getToken = async (code: string) => {
-    return this.authClient.getToken(code);
+    const tokens = this.authClient.getToken(code);
+    if (!tokens) throwGoogleError("failed to obtain access token");
+    return tokens;
   };
 
   getUserInfo = async () => {
@@ -86,7 +105,7 @@ class GoogleAuth {
       }
       return;
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : String(error));
+      throwGoogleError(error);
     }
   };
 }

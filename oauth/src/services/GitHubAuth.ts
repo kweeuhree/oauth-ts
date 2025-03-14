@@ -18,6 +18,12 @@ class GitHubAPIError extends Error {
   }
 }
 
+const throwGitHubError = (error: any) => {
+  throw new GitHubAPIError(
+    error instanceof Error ? error.message : String(error)
+  );
+};
+
 class GitHubAuth {
   private auth;
   private scope: string[] = ["user:email"];
@@ -45,35 +51,24 @@ class GitHubAuth {
       // Because we are communicating directly with a GitHub server,
       // We can be confident that the token is valid
       const access_token = await this.getAccessToken(String(code));
-      if (!access_token) {
-        throw new GitHubAPIError("failed to obtain access token");
-      }
       req.session.token = access_token;
       const user = await this.getUserInfo(access_token);
       return user;
     } catch (error) {
       console.error(error);
-      throw new GitHubAPIError(
-        error instanceof Error ? error.message : String(error)
-      );
+      throwGitHubError(error);
     }
   };
 
   getAccessToken = async (code: string) => {
-    try {
-      const { token } = await this.auth({
-        type: "oauth-user",
-        code: String(code),
-      });
-      if (!token) {
-        throw new GitHubAPIError("failed to exchange code for token");
-      }
-      return token;
-    } catch (error) {
-      throw new GitHubAPIError(
-        error instanceof Error ? error.message : String(error)
-      );
+    const { token } = await this.auth({
+      type: "oauth-user",
+      code: String(code),
+    });
+    if (!token) {
+      throwGitHubError("failed to exchange code for token");
     }
+    return token;
   };
 
   getUserInfo = async (token: string) => {
@@ -83,20 +78,13 @@ class GitHubAuth {
       const name = user.name;
       const { data: emails } =
         await octokit.rest.users.listEmailsForAuthenticatedUser();
-      const email = emails.map((obj) => {
-        if (obj.primary) {
-          return obj.email;
-        }
-        return;
-      })[0];
+      const email = emails.find((obj) => obj.primary)?.email;
       if (name && email) {
         return { name, email };
       }
       return;
     } catch (error) {
-      throw new GitHubAPIError(
-        error instanceof Error ? error.message : String(error)
-      );
+      throwGitHubError(error);
     }
   };
 }
