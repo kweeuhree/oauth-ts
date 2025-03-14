@@ -1,13 +1,15 @@
 import express from "express";
 import session from "express-session";
 import cors from "cors";
-import { auth } from "express-openid-connect";
-require("dotenv").config();
+import "dotenv/config";
 
-import { config } from "./config/auth0Config";
-import { router } from "./routes/routes";
-import { loggerMiddleware, errorHandlerMiddleware } from "./middleware/index";
-import { log } from "./appLogger";
+import { router } from "./routes/routes.js";
+import {
+  loggerMiddleware,
+  errorHandlerMiddleware,
+} from "./middleware/index.js";
+import { HOME_REACT_ADDRESS } from "./config/index.js";
+import { log } from "./appLogger.js";
 
 const app = express();
 
@@ -24,10 +26,7 @@ app.use(loggerMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = [
-  // "https://dev-7g6qecoq3abboxr7.us.auth0.com", // <- auth0 origin
-  "http://localhost:5173",
-];
+const allowedOrigins = [HOME_REACT_ADDRESS];
 app.use(
   cors({
     credentials: true,
@@ -37,14 +36,6 @@ app.use(
 
 // Error handling and auth middlware
 app.use(errorHandlerMiddleware);
-
-// app.use(auth(config));
-
-// // Middleware to make the `user` object available for all views
-// app.use(function (req, res, next) {
-//   res.locals.user = req.oidc.user;
-//   next();
-// });
 
 // Routes
 app.use("/", router);
