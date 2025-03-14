@@ -15,7 +15,7 @@ export const loggerMiddleware = (
 
   // Log the details with INFO prefix
   console.info("INFO\t", logDetails);
-
+  console.log(res);
   next();
 };
 
@@ -34,6 +34,7 @@ export const errorHandlerMiddleware = (
 
   // Log the details with ERROR prefix
   console.error("ERROR\t", errDetails);
+  console.log(req);
   res.status(500).json({ error: "Internal Server Error" });
   next();
 };
