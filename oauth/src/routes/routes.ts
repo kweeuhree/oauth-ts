@@ -14,8 +14,12 @@ export const router = express.Router();
 // router.post("/login", authController.login);
 
 // Google OAuth
-router.get("/google-signin", customAuthController.googleSignIn);
+router.get("/auth/google", customAuthController.googleSignIn);
 router.get("/google-callback", customAuthController.googleCallback);
+
+// GitHub OAuth
+router.get("/auth/github", customAuthController.githubSignIn);
+router.get("/github-callback", customAuthController.githubCallback);
 
 // Auth0
 router.post("/api/callback", authController.auth0callback);
