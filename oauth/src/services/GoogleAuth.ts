@@ -1,13 +1,12 @@
 import { type Auth, google } from "googleapis";
-import { IncomingHttpHeaders } from "node:http";
 
+import { extractCode } from "../utils/extractQueryCode.js";
 import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_CALLBACK_URL,
   GOOGLE_OAUTH_SCOPES,
-} from "../config";
-import { GSession } from "../types";
+} from "../config/index.js";
 
 class GoogleAuth {
   private authClient: Auth.OAuth2Client;
@@ -51,11 +50,7 @@ class GoogleAuth {
   authenticate = async (req: any) => {
     try {
       // Extract authorization code that will be exchanged for user tokens
-      const code = this.extractCode(
-        req.url,
-        req.headers,
-        (req.session as GSession).googleAuthState
-      );
+      const code = extractCode(req, req.session.googleAuthState);
       // Because we are communicating directly with a Google server,
       // We can be confident that the token is valid
       const { tokens } = await this.getToken(code);
@@ -74,32 +69,6 @@ class GoogleAuth {
       }
     } catch (error) {
       console.error(error);
-      throw new Error(error instanceof Error ? error.message : String(error));
-    }
-  };
-
-  // We exchange the authorization code for an access and ID token
-  // by making a post request to Google’s access token endpoint
-  extractCode = (
-    requrl: string,
-    reqheaders: IncomingHttpHeaders,
-    state: string
-  ) => {
-    // Parse the URL to extract necessary parameters
-    const url = new URL(requrl, `http://${reqheaders.host}`);
-    let q = Object.fromEntries(url.searchParams.entries());
-    try {
-      if (q.error) {
-        // An error response e.g. error=access_denied
-        console.error("Error:" + q.error);
-        throw new Error(q.error);
-        // Check state value
-      } else if (q.state !== state) {
-        console.error("State mismatch. Possible CSRF attack");
-        throw new Error("State mismatch. Possible CSRF attack");
-      }
-      return q.code;
-    } catch (error) {
       throw new Error(error instanceof Error ? error.message : String(error));
     }
   };
