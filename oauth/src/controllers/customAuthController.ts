@@ -9,29 +9,47 @@ import {
 import { generateToken, generateRandomHexString } from "../utils/index.ts";
 import { GSession, UserPayload } from "../types/index.ts";
 
-// =======================================
-// GitHub
-// =======================================
-
-export const githubSignIn = async (req: Request, res: Response) => {
+const handleSignIn = async (
+  req: Request,
+  res: Response,
+  authService: any,
+  sessionState: string
+) => {
   const state = generateRandomHexString();
-  (req.session as GSession).githubAuthState = state;
+  (req.session as GSession)[sessionState] = state;
   // Generate a url that asks permissions defined scopes
-  const authorizationUrl = githubAuth.generateAuthUrl(state);
+  const authorizationUrl = authService.generateAuthUrl(state);
   // Redirect the user to authorizationUrl
   res.redirect(authorizationUrl);
 };
 
-export const githubCallback = async (req: Request, res: Response) => {
+const handleCallback = async (
+  req: Request,
+  res: Response,
+  authService: any,
+  sessionState: string
+) => {
   try {
-    const user = await githubAuth.authenticate(req);
+    const user = await authService.authenticate(req);
     if (!user) return;
     sendCookieAndRedirect(res, user);
   } catch (error) {
     res.redirect(String(HOME_REACT_ADDRESS));
   } finally {
-    (req.session as GSession).githubAuthState = "";
+    (req.session as GSession)[sessionState] = "";
   }
+};
+
+// =======================================
+// GitHub
+// =======================================
+
+export const githubSignIn = async (req: Request, res: Response) => {
+  handleSignIn(req, res, githubAuth, "githubAuthState");
+};
+
+export const githubCallback = async (req: Request, res: Response) => {
+  handleCallback(req, res, githubAuth, "githubAuthState");
 };
 
 // =======================================
