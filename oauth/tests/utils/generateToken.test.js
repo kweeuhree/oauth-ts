@@ -1,34 +1,25 @@
 import { describe, expect, test } from "@jest/globals";
-import { generateToken } from "../../src/utils/generateToken.ts";
 
-const mockUsers = {
-  validUser: {
-    email: "foo@bar.dev",
-    name: "Foo",
-  },
-  invalidUser: {
-    missingEmail: {
-      email: "",
-      name: "Foo",
-    },
-    missingName: {
-      email: "foo@bar.dev",
-      name: "",
-    },
-  },
-};
+import { generateToken } from "../../src/utils/generateToken.ts";
+import { mockUsers } from "../../src/mocks/mockUsers.ts";
+
+process.env.JWT_SECRET = "foo_bar";
+process.env.GOOGLE_CLIENT_ID = "hello_world";
+
+jest.mock("jsonwebtoken", () => ({
+  sign: jest.fn().mockImplementation(() => "foo_bar"),
+}));
 
 describe("generateToken", () => {
   test("generates a JWT token", () => {
-    mockUsers.validUser.array.forEach((obj) => {
-      const result = generateToken(obj);
-      expect(result).not.toBe("");
+    mockUsers.validUser.forEach((user) => {
+      const result = generateToken(user);
+      expect(result).toBe("foo_bar");
     });
   });
-  test("throws error with partial input", () => {
-    mockUsers.invalidUser.array.forEach((obj) => {
-      const result = generateToken(obj);
-      expect(result).toBe("");
+  test("throws error with partial or missing credentials", () => {
+    mockUsers.invalidUser.forEach((user) => {
+      expect(() => generateToken(user)).toThrow("missing credentials");
     });
   });
 });
