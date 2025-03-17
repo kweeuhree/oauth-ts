@@ -9,6 +9,9 @@ export const generateToken = ({
   email: string;
   name: string;
 }): string => {
+  if (!email || !name) {
+    throw new Error("missing credentials");
+  }
   const options: SignOptions = {
     algorithm: "HS256",
     expiresIn: "1d",
