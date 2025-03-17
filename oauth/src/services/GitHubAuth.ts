@@ -1,11 +1,13 @@
+import { Octokit } from "octokit";
 import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
+
 import {
   GITHUB_CLIENT_SECRET,
   GITHUB_CLIENT_ID,
   GITHUB_REDIRECT_URL,
-} from "../config/githubConfig.js";
-import { extractCode } from "../utils/index.js";
-import { Octokit } from "octokit";
+} from "../config/githubConfig.ts";
+import { interactWithDatabase } from "../controllers/index.ts";
+import { extractCode } from "../utils/index.ts";
 
 class GitHubAPIError extends Error {
   constructor(message: string) {
@@ -53,6 +55,8 @@ class GitHubAuth {
       const access_token = await this.getAccessToken(String(code));
       req.session.token = access_token;
       const user = await this.getUserInfo(access_token);
+      if (!user) return;
+      interactWithDatabase(user);
       return user;
     } catch (error) {
       console.error(error);

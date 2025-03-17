@@ -3,13 +3,13 @@ import session from "express-session";
 import cors from "cors";
 import "dotenv/config";
 
-import { router } from "./routes/routes.js";
+import { router } from "./routes/routes.ts";
 import {
   loggerMiddleware,
   errorHandlerMiddleware,
-} from "./middleware/index.js";
-import { HOME_REACT_ADDRESS } from "./config/index.js";
-import { log } from "./appLogger.js";
+} from "./middleware/index.ts";
+import { HOME_REACT_ADDRESS } from "./config/index.ts";
+import { log } from "./appLogger.ts";
 
 const app = express();
 

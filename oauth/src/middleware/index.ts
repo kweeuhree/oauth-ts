@@ -1,1 +1,1 @@
-export * from "./loggerMiddleware.js";
+export * from "./loggerMiddleware.ts";

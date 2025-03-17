@@ -1,6 +1,6 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 
-import { GOOGLE_CLIENT_ID } from "../config/index.js";
+import { GOOGLE_CLIENT_ID } from "../config/index.ts";
 
 export const generateToken = ({
   email,
@@ -8,7 +8,7 @@ export const generateToken = ({
 }: {
   email: string;
   name: string;
-}) => {
+}): string => {
   const options: SignOptions = {
     algorithm: "HS256",
     expiresIn: "1d",

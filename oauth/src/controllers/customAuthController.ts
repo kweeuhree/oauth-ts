@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 
-import { googleAuth, githubAuth } from "../services/index.js";
+import { googleAuth, githubAuth } from "../services/index.ts";
 
 import {
   LOGGED_IN_REACT_ADDRESS,
   HOME_REACT_ADDRESS,
-} from "../config/index.js";
-import { generateToken, generateRandomHexString } from "../utils/index.js";
-import { GSession } from "../types.js";
-
-let users: string[] = [];
-
-interface UserPayload {
-  email: string;
-  name: string;
-}
+} from "../config/index.ts";
+import { generateToken, generateRandomHexString } from "../utils/index.ts";
+import { GSession, UserPayload } from "../types/index.ts";
 
 // =======================================
 // GitHub
@@ -33,7 +26,7 @@ export const githubCallback = async (req: Request, res: Response) => {
   try {
     const user = await githubAuth.authenticate(req);
     if (!user) return;
-    processUserAndSendResponse(res, user);
+    sendCookieAndRedirect(res, user);
   } catch (error) {
     res.redirect(String(HOME_REACT_ADDRESS));
   } finally {
@@ -63,7 +56,7 @@ export const googleCallback = async (req: Request, res: Response) => {
   try {
     const user = await googleAuth.authenticate(req);
     if (!user) return;
-    processUserAndSendResponse(res, user);
+    sendCookieAndRedirect(res, user);
   } catch (error) {
     res.redirect(String(HOME_REACT_ADDRESS));
   } finally {
@@ -71,14 +64,12 @@ export const googleCallback = async (req: Request, res: Response) => {
   }
 };
 
-const processUserAndSendResponse = (res: Response, user: UserPayload) => {
-  try {
-    // =======================================
-    // Database interaction
-    // =======================================
-    interactWithDatabase(user);
-    // =======================================
+// =======================================
+// Send cookie and redirect to React
+// =======================================
 
+const sendCookieAndRedirect = (res: Response, user: UserPayload) => {
+  try {
     const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
@@ -88,13 +79,5 @@ const processUserAndSendResponse = (res: Response, user: UserPayload) => {
     res.redirect(LOGGED_IN_REACT_ADDRESS);
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
-  }
-};
-
-const interactWithDatabase = (user: UserPayload) => {
-  if (!user.email) return;
-  let exists = users.includes(user.email);
-  if (!exists) {
-    users.push(user.email);
   }
 };

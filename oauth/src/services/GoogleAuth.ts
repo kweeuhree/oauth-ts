@@ -1,12 +1,13 @@
 import { type Auth, google } from "googleapis";
 
-import { extractCode } from "../utils/extractQueryCode.js";
+import { extractCode } from "../utils/extractQueryCode.ts";
 import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_CALLBACK_URL,
   GOOGLE_OAUTH_SCOPES,
-} from "../config/index.js";
+} from "../config/index.ts";
+import { interactWithDatabase } from "../controllers/index.ts";
 
 class GoogleAPIError extends Error {
   constructor(message: string) {
@@ -82,6 +83,8 @@ class GoogleAuth {
       ) {
         // Get user email and name
         const user = await this.getUserInfo();
+        if (!user) return;
+        interactWithDatabase(user);
         return user;
       }
     } catch (error) {

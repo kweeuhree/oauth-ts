@@ -1,3 +1,3 @@
-export * from "./generateRandomHexString.js";
-export * from "./generateToken.js";
-export * from "./extractQueryCode.js";
+export * from "./generateRandomHexString.ts";
+export * from "./generateToken.ts";
+export * from "./extractQueryCode.ts";

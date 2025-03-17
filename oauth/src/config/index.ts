@@ -1,3 +1,3 @@
-export * from "./googleConfig.js";
-export * from "./githubConfig.js";
-export * from "./reactRedirectAddress.js";
+export * from "./googleConfig.ts";
+export * from "./githubConfig.ts";
+export * from "./reactRedirectAddress.ts";

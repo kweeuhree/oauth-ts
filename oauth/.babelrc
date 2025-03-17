@@ -1,0 +1,4 @@
+// Enable Jest with TypeScript with Babel
+{
+  "presets": ["@babel/preset-env", "@babel/preset-typescript"]
+}
