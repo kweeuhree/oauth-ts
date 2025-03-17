@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-
 import { googleAuth, githubAuth } from "../services/index.ts";
 
 import {
@@ -15,12 +14,17 @@ const handleSignIn = async (
   authService: any,
   sessionState: string
 ) => {
-  const state = generateRandomHexString();
-  (req.session as GSession)[sessionState] = state;
-  // Generate a url that asks permissions defined scopes
-  const authorizationUrl = authService.generateAuthUrl(state);
-  // Redirect the user to authorizationUrl
-  res.redirect(authorizationUrl);
+  try {
+    const state = generateRandomHexString();
+    (req.session as GSession)[sessionState] = state;
+    // Generate a url that asks permissions defined scopes
+    const authorizationUrl = authService.generateAuthUrl(state);
+    // Redirect the user to authorizationUrl
+    res.redirect(authorizationUrl);
+  } catch (error) {
+    console.error(error);
+    res.end(error);
+  }
 };
 
 const handleCallback = async (
@@ -34,7 +38,13 @@ const handleCallback = async (
     if (!user) return;
     sendCookieAndRedirect(res, user);
   } catch (error) {
-    res.redirect(String(HOME_REACT_ADDRESS));
+    console.error(error);
+    const redirectUrl = `${HOME_REACT_ADDRESS}/?error=${error}`;
+    // =======================================
+    // Warn for testing purposes
+    console.warn(`Redirecting to: ${redirectUrl}`);
+    // =======================================
+    res.redirect(String(redirectUrl));
   } finally {
     (req.session as GSession)[sessionState] = "";
   }
@@ -43,7 +53,6 @@ const handleCallback = async (
 // =======================================
 // GitHub
 // =======================================
-
 export const githubSignIn = async (req: Request, res: Response) => {
   handleSignIn(req, res, githubAuth, "githubAuthState");
 };
@@ -55,37 +64,17 @@ export const githubCallback = async (req: Request, res: Response) => {
 // =======================================
 // Google
 // =======================================
-
 export const googleSignIn = async (req: Request, res: Response) => {
-  try {
-    const state = generateRandomHexString();
-    (req.session as GSession).googleAuthState = state;
-    // Generate a url that asks permissions defined scopes
-    const authorizationUrl = googleAuth.generateAuthUrl(state);
-    // Redirect the user to authorizationUrl
-    res.redirect(authorizationUrl);
-  } catch (error) {
-    console.error(error);
-    res.end(error);
-  }
+  handleSignIn(req, res, googleAuth, "googleAuthState");
 };
 
 export const googleCallback = async (req: Request, res: Response) => {
-  try {
-    const user = await googleAuth.authenticate(req);
-    if (!user) return;
-    sendCookieAndRedirect(res, user);
-  } catch (error) {
-    res.redirect(String(HOME_REACT_ADDRESS));
-  } finally {
-    (req.session as GSession).googleAuthState = "";
-  }
+  handleCallback(req, res, googleAuth, "googleAuthState");
 };
 
 // =======================================
 // Send cookie and redirect to React
 // =======================================
-
 const sendCookieAndRedirect = (res: Response, user: UserPayload) => {
   try {
     const token = generateToken(user);

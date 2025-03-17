@@ -16,6 +16,6 @@ export const extractCode = (req: any, state: string) => {
     }
     return q.code;
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : String(error));
+    throw new Error("failed to extract code from the request query");
   }
 };

@@ -1,5 +1,8 @@
 import { Octokit } from "octokit";
-import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
+import {
+  type OAuthAppAuthInterface,
+  createOAuthAppAuth,
+} from "@octokit/auth-oauth-app";
 
 import {
   GITHUB_CLIENT_SECRET,
@@ -27,7 +30,7 @@ const throwGitHubError = (error: any) => {
 };
 
 class GitHubAuth {
-  private auth;
+  private auth: OAuthAppAuthInterface;
   private scope: string[] = ["user:email"];
   constructor(
     private readonly clientId: string,
