@@ -3,9 +3,6 @@ import { describe, expect, test } from "@jest/globals";
 import { generateToken } from "../../src/utils/generateToken.ts";
 import { mockUsers } from "../../src/mocks/mockUsers.ts";
 
-process.env.JWT_SECRET = "foo_bar";
-process.env.GOOGLE_CLIENT_ID = "hello_world";
-
 jest.mock("jsonwebtoken", () => ({
   sign: jest.fn().mockImplementation(() => "foo_bar"),
 }));
